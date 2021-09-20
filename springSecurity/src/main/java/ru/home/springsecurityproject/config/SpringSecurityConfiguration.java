@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import ru.home.springsecurityproject.model.Permission;
 import ru.home.springsecurityproject.model.Roles;
 
 /**
@@ -33,9 +34,9 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter
         http.csrf().disable()                                               //отключаем защиту CSRF
                 .authorizeRequests()                                        //авторизуем запросы следующим образом
                 .antMatchers("/").permitAll()                   //могут отправлять все пользователи по этому паттерну
-                .antMatchers(HttpMethod.GET, "/employees/**").hasAnyRole(Roles.ADMIN.name(), Roles.USER.name())
-                .antMatchers(HttpMethod.POST, "/employees/**").hasAnyRole(Roles.ADMIN.name())
-                .antMatchers(HttpMethod.DELETE, "/employees/**").hasAnyRole(Roles.ADMIN.name())
+                .antMatchers(HttpMethod.GET, "/employees/**").hasAuthority(Permission.EMPLOYEES_READ.getPermission())
+                .antMatchers(HttpMethod.POST, "/employees/**").hasAuthority(Permission.EMPLOYEES_WRITE.getPermission())
+                .antMatchers(HttpMethod.DELETE, "/employees/**").hasAuthority(Permission.EMPLOYEES_WRITE.getPermission())
                 .anyRequest()                                               //каждый запрос
                 .authenticated()                                            //должен быть аутентифицирован
                 .and()
@@ -55,13 +56,13 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter
                 User.builder()
                         .username("admin")
                         .password(encoder().encode("admin"))
-                        .roles(Roles.ADMIN.name())
+                        .authorities(Roles.ADMIN.getAuthorities())
                         .build(),
                 //Добавляем пользователя User
                 User.builder()
                         .username("user")
                         .password(encoder().encode("user"))
-                        .roles(Roles.USER.name())
+                        .authorities(Roles.USER.getAuthorities())
                         .build());
     }
 
