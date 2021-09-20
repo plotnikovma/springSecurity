@@ -2,7 +2,7 @@ package ru.home.springsecurityproject.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -12,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import ru.home.springsecurityproject.model.Permission;
+import ru.home.springsecurityproject.config.Constants.Encoder;
 import ru.home.springsecurityproject.model.Roles;
 
 /**
@@ -23,6 +23,7 @@ import ru.home.springsecurityproject.model.Roles;
  */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)                          //включение авторизации через аннотации в контроллере
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter
 {
     /**
@@ -34,9 +35,6 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter
         http.csrf().disable()                                               //отключаем защиту CSRF
                 .authorizeRequests()                                        //авторизуем запросы следующим образом
                 .antMatchers("/").permitAll()                   //могут отправлять все пользователи по этому паттерну
-                .antMatchers(HttpMethod.GET, "/employees/**").hasAuthority(Permission.EMPLOYEES_READ.getPermission())
-                .antMatchers(HttpMethod.POST, "/employees/**").hasAuthority(Permission.EMPLOYEES_WRITE.getPermission())
-                .antMatchers(HttpMethod.DELETE, "/employees/**").hasAuthority(Permission.EMPLOYEES_WRITE.getPermission())
                 .anyRequest()                                               //каждый запрос
                 .authenticated()                                            //должен быть аутентифицирован
                 .and()
@@ -72,6 +70,6 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter
     @Bean
     protected PasswordEncoder encoder()
     {
-        return new BCryptPasswordEncoder(Constants.B_CRYPT_PASSWORD_CAPACITY);
+        return new BCryptPasswordEncoder(Encoder.B_CRYPT_PASSWORD_CAPACITY);
     }
 }

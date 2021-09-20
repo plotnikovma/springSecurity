@@ -1,5 +1,7 @@
 package ru.home.springsecurityproject.model;
 
+import static ru.home.springsecurityproject.config.Constants.Permission.*;
+
 /**
  * Права для ролей системы
  *
@@ -8,8 +10,8 @@ package ru.home.springsecurityproject.model;
  */
 public enum Permission
 {
-    EMPLOYEES_READ("employees:read"),
-    EMPLOYEES_WRITE("employees:write");
+    EMPLOYEES_READ(READ),
+    EMPLOYEES_WRITE(WRITE);
     private final String permission;
 
     Permission(String permission)

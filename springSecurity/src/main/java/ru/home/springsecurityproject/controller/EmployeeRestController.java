@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,7 @@ public class EmployeeRestController
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('employees:read')")
     public Employee getById(@PathVariable Long id)
     {
         return USERS.stream()
@@ -47,6 +49,7 @@ public class EmployeeRestController
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('employees:write')")
     public Employee create(@RequestBody Employee employee)
     {
         USERS.add(employee);
@@ -55,6 +58,7 @@ public class EmployeeRestController
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('employees:write')")
     public void deleteById(@PathVariable Long id)
     {
         USERS.removeIf(user -> user.getId().equals(id));
