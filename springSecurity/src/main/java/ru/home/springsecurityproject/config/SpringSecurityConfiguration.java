@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import ru.home.springsecurityproject.config.Constants.Encoder;
 import ru.home.springsecurityproject.model.Roles;
@@ -38,7 +39,18 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter
                 .anyRequest()                                               //каждый запрос
                 .authenticated()                                            //должен быть аутентифицирован
                 .and()
-                .httpBasic();                                               //и я хочу использовать HTTP Basic для аутентификации
+                .formLogin()                                                //и использовать форму аутентификации
+                .loginPage("/auth/login")                                   //расположенную по этому пути
+                .permitAll()                                                //форма доступна всем
+                .defaultSuccessUrl("/auth/success")                         //в случае успеха переход по этому пути
+                .and()                                                      //и
+                .logout()                                                   //настроим logout так
+                .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout", "POST")) //что logout обрабатывается AntPathRequestMatcher и должен происходить по ссылке /auth/logout с методом POST
+                .invalidateHttpSession(true)                                //инвалидируем текущую сессию с JSESSIONID
+                .clearAuthentication(true)                                  //чистим аутентификацию
+                .deleteCookies("JSESSIONID")                                //удаляем id сессии из cookie
+                .logoutSuccessUrl("/auth/login");                           //после logout переходим на страницу login
+
     }
 
     /**
